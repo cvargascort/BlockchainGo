@@ -9,6 +9,6 @@ func main() {
 
 	router := NewRouter()
 
-	server := http.ListenAndServe(":4444", router)
+	server := http.ListenAndServe(":8002", router)
 	log.Fatal(server)
 }

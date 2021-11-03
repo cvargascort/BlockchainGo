@@ -1,12 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
+	"io/ioutil"
 	"net/http"
-	"net/url"
-	"strconv"
+	"time"
 )
 
 var transacciones = Transacciones{}
@@ -27,29 +27,47 @@ func RegistrarTransaccion(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	transacciones = append(transacciones, transaccionData) //Guardado en arreglo innecesario
+	transacciones = nil
+	transacciones = append(transacciones, transaccionData) //Guardado en arreglo para usarse posteriormente
 
-	dataPost := url.Values{
-		"Nombre":        {transaccionData.Nombre},
-		"CuentaOrigen":  {strconv.Itoa(transaccionData.CuentaOrigen)},
-		"CuentaDestino": {strconv.Itoa(transaccionData.CuentaDestino)},
-		"Monto":         {strconv.Itoa(transaccionData.Monto)},
-	}
+	/*dataPost := url.Values{
+		"Nombre":        {transacciones[0].Nombre},
+		"CuentaOrigen":  {strconv.Itoa(transacciones[0].CuentaOrigen)},
+		"CuentaDestino": {strconv.Itoa(transacciones[0].CuentaDestino)},
+		"Monto":         {strconv.Itoa(transacciones[0].Monto)},
+	}*/
 
-	//Enviar a controlador de log
-	resp, err := http.PostForm("http://localhost:8081/RegistrarTransaccion", dataPost)
+	client := &http.Client{}
+	time.Sleep(1 * time.Millisecond)
+	//req, err := http.PostForm("http://localhost:8081/RegistrarTransaccion", dataPost)
+	bodyJson, _ := json.Marshal(transaccionData)
+	req, err := http.NewRequest("POST", "http://127.0.0.1:4444/RegistrarTransaccion", bytes.NewReader(bodyJson))
+	req.Close = true
 
-	log.Println("************* Por aqui va la vaina *************************")
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	req.Body.Close()
 
 	if err != nil {
 		fmt.Println("error: ", err)
 	} else {
-		var res map[string]interface{}
 
-		json.NewDecoder(resp.Body).Decode(&res)
+		//var res map[string]interface{}
 
-		fmt.Println(res["form"])
+		cuerpoRespuesta, err := ioutil.ReadAll(resp.Body)
+		if err == nil {
+
+		}
+		respuestaString := string(cuerpoRespuesta)
+		//log.Printf("Código de respuesta: %d", resp.StatusCode)
+		//log.Printf("Encabezados: '%q'", resp.Header)
+		//contentType := resp.Header.Get("Content-Type")
+		//log.Printf("El tipo de contenido: '%s'", contentType)
+		//log.Printf("Cuerpo de respuesta del servidor: '%s'", respuestaString)
+		fmt.Fprintln(w, respuestaString)
 	}
+
 	//Enviar a controlador de blockchain
 }
 

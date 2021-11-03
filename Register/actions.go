@@ -18,6 +18,7 @@ func RegistrarTransaccion(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var transaccionData Transaccion
 
+	log.Println("Llego por aqui")
 	err := decoder.Decode(&transaccionData)
 	if err != nil {
 		panic(err)
