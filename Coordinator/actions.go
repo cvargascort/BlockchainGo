@@ -68,7 +68,11 @@ func RegistrarTransaccion(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, respuestaString)
 	}
 
-	//Enviar a controlador de blockchain
+	//Validar si el bloque esta lleno (3 transacciones por bloque)(Blockchain)
+	// Si esta lleno, enviar peticion a openCloser
+	// Si esta lleno, despues de cerrar el bloque, se envia a Blockchain petición para abrir el bloque
+
+	//Enviar a controlador de blockchain RegistrarTransaccion
 }
 
 func ConsultarFondos(w http.ResponseWriter, r *http.Request) {
